@@ -1,0 +1,18 @@
+num_gpus: 2
+max_num_seqs: 256
+overload_threshold: 3
+gpu_memory_utilization: 0.7
+
+models:
+  -
+    name: llm-0
+    model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-30b
+    tensor_parallel_size: 2
+    pipeline_parallel_size: 1
+    placement:
+      - [0, 1]
+    mps_percentage: [100, 40]
+    model_dtype: fp16
+workloads:
+  # workload generation refer to README
+  workload_file:

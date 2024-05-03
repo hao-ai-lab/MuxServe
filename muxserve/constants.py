@@ -1,0 +1,6 @@
+SM_HOLD_NAME_FMT = "{}_HD_{}"
+
+ADD_REQ_NAME_FMT = "{}_ADD_{}"
+RET_REQ_NAME_FMT = "{}_RET_{}"
+
+PREEMPT_REQ_NAME_FMT = "{}_PRE_{}"

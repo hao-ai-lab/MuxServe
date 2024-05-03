@@ -1,0 +1,43 @@
+num_gpus: 4
+max_num_seqs: 256
+overload_threshold: 2
+gpu_memory_utilization: 0.4
+
+models:
+  -
+    # unique name for the model to be served
+    name: llm-0
+    # model checkpoint name or path
+    model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-7b
+    tensor_parallel_size: 1
+    pipeline_parallel_size: 4
+    placement:
+      - [0, 1, 2, 3]
+    mps_percentage: [80, 30]
+    model_dtype: fp16
+  -
+    name: llm-1
+    model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+    tensor_parallel_size: 1
+    pipeline_parallel_size: 4
+    placement:
+      - [0, 1, 2, 3]
+    mps_percentage: [90, 40]
+    model_dtype: fp16
+  -
+    name: llm-2
+    model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+    tensor_parallel_size: 1
+    pipeline_parallel_size: 4
+    placement:
+      - [0, 1, 2, 3]
+    mps_percentage: [100, 50]
+    model_dtype: fp16
+workloads:
+  # workload generation refer to README
+  workload_file: /mnt/afs/jfduan/LLMInfer/MuxServe/examples/workloads/sharegpt_r5_r5_r5.json
+  dataset: /mnt/afs/jfduan/datas/raw/sharegpt_v3/ShareGPT_V3_unfiltered_cleaned_split.json
+  arrival_rates: [20, 20]
+  start: 0
+  duration: 1000
+  num_requests: 10

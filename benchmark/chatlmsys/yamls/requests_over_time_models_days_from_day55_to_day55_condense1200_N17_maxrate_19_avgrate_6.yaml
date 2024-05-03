@@ -1,0 +1,54 @@
+cluster:
+  nnodes: 4
+  ngpus_per_node: 8
+models:
+- name: llm-1
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  rate: 19.52777777777778
+- name: llm-2
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  rate: 2.805555555555556
+- name: llm-3
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  rate: 17.0
+- name: llm-4
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-7b
+  rate: 19.555555555555554
+- name: llm-5
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  rate: 2.638888888888889
+- name: llm-6
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  rate: 4.444444444444445
+- name: llm-7
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-7b
+  rate: 2.3611111111111107
+- name: llm-8
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-30b
+  rate: 4.916666666666667
+- name: llm-9
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-30b
+  rate: 1.8333333333333335
+- name: llm-10
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-65b
+  rate: 1.9166666666666667
+- name: llm-11
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-30b
+  rate: 14.833333333333334
+- name: llm-12
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  rate: 4.555555555555555
+- name: llm-13
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-7b
+  rate: 4.694444444444444
+- name: llm-14
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-65b
+  rate: 2.111111111111111
+- name: llm-15
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-7b
+  rate: 7.583333333333333
+- name: llm-16
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-65b
+  rate: 3.25
+avg_output_len: 261.31368186874306
+avg_prompt_len: 100.17204301075269

@@ -1,0 +1,19 @@
+num_gpus: 2
+max_num_seqs: 256
+overload_threshold: 2
+gpu_memory_utilization: 0.7175
+models:
+- name: llm-5
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  tensor_parallel_size: 2
+  pipeline_parallel_size: 1
+  placement:
+  - - 0
+    - 1
+  mps_percentage:
+  - 90
+  - 30
+  max_num_seqs: 7
+  model_dtype: fp16
+workloads:
+  workload_file:

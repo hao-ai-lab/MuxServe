@@ -1,0 +1,79 @@
+num_gpus: 8
+max_num_seqs: 256
+overload_threshold: 2
+gpu_memory_utilization: 0.195
+models:
+- name: llm-1
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  tensor_parallel_size: 8
+  pipeline_parallel_size: 1
+  placement:
+  - - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+  mps_percentage:
+  - 90
+  - 30
+  max_num_seqs: 445
+  model_dtype: fp16
+- name: llm-3
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  tensor_parallel_size: 8
+  pipeline_parallel_size: 1
+  placement:
+  - - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+  mps_percentage:
+  - 90
+  - 30
+  max_num_seqs: 362
+  model_dtype: fp16
+- name: llm-14
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-65b
+  tensor_parallel_size: 8
+  pipeline_parallel_size: 1
+  placement:
+  - - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+  mps_percentage:
+  - 100
+  - 30
+  max_num_seqs: 18
+  model_dtype: fp16
+- name: llm-2
+  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
+  tensor_parallel_size: 8
+  pipeline_parallel_size: 1
+  placement:
+  - - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+  mps_percentage:
+  - 90
+  - 30
+  max_num_seqs: 11
+  model_dtype: fp16
+workloads:
+  workload_file:
