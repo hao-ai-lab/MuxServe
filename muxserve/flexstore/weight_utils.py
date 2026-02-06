@@ -46,6 +46,8 @@ def convert_pyslice_to_tensor(x: Any) -> torch.Tensor:
 class Disabledtqdm(tqdm):
 
     def __init__(self, *args, **kwargs):
+        # Remove 'disable' if already present to avoid duplicate keyword argument
+        kwargs.pop('disable', None)
         super().__init__(*args, **kwargs, disable=True)
 
 
