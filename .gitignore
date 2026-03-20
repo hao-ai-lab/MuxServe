@@ -167,3 +167,7 @@ log/*
 
 *.pdf
 *.pkl
+
+# large trace
+examples/arena_trace.json
+examples/ShareGPT_V3_unfiltered_cleaned_split.json

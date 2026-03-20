@@ -9,15 +9,15 @@ END_TO_END_DIR = os.path.dirname(__file__)
 PROJ_DIR = f"{os.path.dirname(__file__)}/../.."
 
 MODEL_TO_PATH = {
-    "llama-7b": "/mnt/afs/share/LLMCKPTs/huggyllama/llama-7b",
-    "llama-13b": "/mnt/afs/share/LLMCKPTs/huggyllama/llama-13b",
-    "llama-30b": "/mnt/afs/share/LLMCKPTs/huggyllama/llama-30b",
-    "llama-65b": "/mnt/afs/share/LLMCKPTs/huggyllama/llama-65b",
+    "llama-7b": "/data/lrc/workspace/huggyllama/llama-7b",
+    "llama-13b": "/data/lrc/workspace/huggyllama/llama-13b",
+    "llama-30b": "/data/lrc/workspace/huggyllama/llama-30b",
+    "llama-65b": "/data/lrc/workspace/huggyllama/llama-65b",
 }
 # path to `ShareGPT_V3_unfiltered_cleaned_split.json`
-SHAREGPT_PATH = "/mnt/afs/dmhj/datasets/ShareGPT_V3_unfiltered_cleaned_split.json"
+SHAREGPT_PATH = "/data/lrc/workspace/dataset/ShareGPT_Vicuna_unfiltered/ShareGPT_V3_unfiltered_cleaned_split.json"
 # this is for caching tokenized ShareGPT_V3 dataset. Specify it to accelerate config generation
-TOKENIZED_DATA_CACHE = "/mnt/afs/dmhj/datasets/ShareGPT_V3_llama_tokenized.cache"
+TOKENIZED_DATA_CACHE = "/data/lrc/workspace/datasets/ShareGPT_V3_llama_tokenized.cache"
 # statistic cost file
 COST_FILE = f"{PROJ_DIR}/examples/placement/llama.json"
 
@@ -71,7 +71,7 @@ def get_workload_from_optimized_placement(
     dump_dir: str,
     **kwargs,
 ):
-    from muxserve.muxsched.workload_utils import get_workloads_info_from_yaml, generate_workload, sample_request_datas
+    from muxserve.muxsched.workload_utils import get_workloads_info_from_yaml, generate_workload, sample_requests
 
     workload_infos = get_workloads_info_from_yaml(models_yaml)
 
@@ -90,9 +90,7 @@ def get_workload_from_optimized_placement(
         cur_num_req = int(model_tpt * time * 1.1)
         num_req.append(cur_num_req)
         sampled_req.append(
-            sample_request_datas(cur_num_req,
-                                 SHAREGPT_PATH,
-                                 tokenized_cache_path=TOKENIZED_DATA_CACHE))
+            sample_requests(cur_num_req, SHAREGPT_PATH, tokenized_cache_path=TOKENIZED_DATA_CACHE))
     max_num_req = max(num_req)
 
     kwargs.update({

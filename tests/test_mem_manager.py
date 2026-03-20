@@ -154,14 +154,14 @@ if __name__ == "__main__":
 
     job_configs = [
         JobConfig(
-            model="/mnt/afs/share/LLMCKPTs/huggyllama/llama-7b",
+            model_path="/mnt/afs/share/LLMCKPTs/huggyllama/llama-7b",
             pipeline_parallel_size=1,
             tensor_parallel_size=4,
             placement=[[0, 1, 2, 3]],
             mps_percentage=None,
         ),
         JobConfig(
-            model="/mnt/afs/share/LLMCKPTs/huggyllama/llama-13b",
+            model_path="/mnt/afs/share/LLMCKPTs/huggyllama/llama-13b",
             pipeline_parallel_size=1,
             tensor_parallel_size=4,
             placement=[[0, 1, 2, 3]],

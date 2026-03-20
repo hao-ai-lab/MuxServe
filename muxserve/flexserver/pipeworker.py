@@ -60,23 +60,26 @@ class PipeWorker(Worker):
                                post_process=post_process)
 
     @classmethod
-    def pipeline_split(cls, num_hidden_layers: int,
-                       pipeline_parallel_size: int):
+    def pipeline_split(cls, num_hidden_layers: int, pipeline_parallel_size: int):
+        """在流水线上划分每一段的层数"""
         num_layer_per_part = num_hidden_layers // pipeline_parallel_size
         partition = [num_layer_per_part] * pipeline_parallel_size
         if num_hidden_layers % pipeline_parallel_size == pipeline_parallel_size - 1:
-            start_partition = 0
+            start_partition = 0 # 尾段开销大，尽量少分
         else:
-            start_partition = 1
+            start_partition = 1 # 首段开销大，也尽量少分
         for i in range(num_hidden_layers % pipeline_parallel_size):
             partition[start_partition + i] += 1
         return partition
 
-    def _prepare_inputs_metadata(self, prompt_lens: List[int],
-                                 slot_mapping: torch.Tensor,
-                                 context_lens: torch.Tensor,
-                                 max_context_len: int,
-                                 block_tables: torch.Tensor) -> InputMetadata:
+    def _prepare_inputs_metadata(
+            self, 
+            prompt_lens: List[int],
+            slot_mapping: torch.Tensor,
+            context_lens: torch.Tensor,
+            max_context_len: int,
+            block_tables: torch.Tensor
+        ) -> InputMetadata:
 
         input_metadata = InputMetadata(
             seq_groups=None,

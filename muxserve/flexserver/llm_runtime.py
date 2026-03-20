@@ -8,8 +8,7 @@ import torch
 import torch.distributed as dist
 
 from muxserve.batch_scheduler import BatchScheduler
-from vllm.config import (CacheConfig, ModelConfig, ParallelConfig,
-                         SchedulerConfig)
+from vllm.config import (CacheConfig, ModelConfig, ParallelConfig, SchedulerConfig)
 from vllm.model_executor import InputMetadata
 from vllm.sampling_params import SamplingParams
 from vllm.transformers_utils.tokenizer import (detokenize_incrementally,

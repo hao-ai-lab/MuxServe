@@ -12,15 +12,12 @@ class GreedySampler(nn.Module):
         super().__init__()
         self.vocab_size = vocab_size
 
-    def forward(self, embedding: torch.Tensor, hidden_states: torch.Tensor,
-                input_metadata: InputMetadata):
+    def forward(self, embedding: torch.Tensor, hidden_states: torch.Tensor, input_metadata: InputMetadata):
 
         if input_metadata.num_prompts > 0:
             assert input_metadata.num_generation_tokens == 0
             indices = np.cumsum(input_metadata.prompt_lens) - 1
-            indices = torch.tensor(indices,
-                                   dtype=torch.int,
-                                   device=hidden_states.device)
+            indices = torch.tensor(indices, dtype=torch.int, device=hidden_states.device)
             hidden_states = hidden_states.index_select(0, indices)
 
         logits = _get_logits(hidden_states, embedding, None, self.vocab_size)

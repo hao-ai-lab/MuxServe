@@ -2,7 +2,7 @@ import io
 import os
 import re
 import subprocess
-from typing import List, Set
+from typing import Set
 import warnings
 
 from packaging.version import parse, Version
@@ -30,12 +30,7 @@ if CUDA_HOME is None:
 
 
 def get_nvcc_cuda_version(cuda_dir: str) -> Version:
-    """Get the CUDA version from nvcc.
-
-    Adapted from https://github.com/NVIDIA/apex/blob/8b7a1ff183741dd8f9b87e7bafd04cfde99cea28/setup.py
-    """
-    nvcc_output = subprocess.check_output([cuda_dir + "/bin/nvcc", "-V"],
-                                          universal_newlines=True)
+    nvcc_output = subprocess.check_output([cuda_dir + "/bin/nvcc", "-V"], universal_newlines=True)
     output = nvcc_output.split()
     release_idx = output.index("release") + 1
     nvcc_cuda_version = parse(output[release_idx].split(",")[0])

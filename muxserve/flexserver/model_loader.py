@@ -25,6 +25,14 @@ _MODEL_REGISTRY = {
 @contextlib.contextmanager
 def _set_default_torch_dtype(dtype: torch.dtype):
     """Sets the default torch dtype to the given dtype."""
+    if isinstance(dtype, str):
+        dtype_map = {
+            "float32": torch.float32,
+            "float16": torch.float16,
+            "bfloat16": torch.bfloat16,
+            "float64": torch.float64,
+        }
+        dtype = dtype_map.get(dtype.lower(), torch.float32)  # 未知字符串默认 float32
     old_dtype = torch.get_default_dtype()
     torch.set_default_dtype(dtype)
     yield

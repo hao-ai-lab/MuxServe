@@ -20,7 +20,7 @@ from muxserve.constants import (SM_HOLD_NAME_FMT, ADD_REQ_NAME_FMT,
                               RET_REQ_NAME_FMT, PREEMPT_REQ_NAME_FMT)
 from muxserve.flexserver.pipeworker import PipeWorker
 from muxserve.muxsched.launcher import launch_flexserver_process
-from muxserve.muxsched.resource import SMResource, SMPart
+from muxserve.muxsched.muxsched_resource import SMResource, SMPart
 from muxserve.muxsched.workload_utils import get_workload, Workload, Request
 from muxserve.shm_utils import (create_shared_var, read_shared_var,
                               write_shared_var, dump_to_shared_var,
@@ -159,7 +159,7 @@ class MuxScheduler:
         time.sleep(5)
         for model_id, job_config in enumerate(self.muxserve_config.job_configs):
             model_name = job_config.name
-            self._name_to_model[model_name] = job_config.model
+            self._name_to_model[model_name] = job_config.model_path
             self.pipeline_parallel_size = job_config.pipeline_parallel_size
             # self.max_num_seqs[model_name] = self.muxserve_config.max_num_seqs
             self.max_num_seqs[model_name] = job_config.max_num_seqs
@@ -167,9 +167,7 @@ class MuxScheduler:
             assert len(job_config.mps_percentage) == 2
             for i, mps_percentage in enumerate(job_config.mps_percentage):
                 name = SM_HOLD_NAME_FMT.format(model_name, mps_percentage)
-                shm_var = create_shared_var(name,
-                                            size=self.shm_size,
-                                            create=True)
+                shm_var = create_shared_var(name, size=self.shm_size, create=True)
                 self.sm_hold_name_to_shm[name] = shm_var
 
                 dual_mps = job_config.mps_percentage[(i + 1) % 2]
@@ -182,7 +180,7 @@ class MuxScheduler:
                     proc = launch_flexserver_process(
                         model_id,
                         model_name,
-                        job_config.model,
+                        job_config.model_path,
                         self.muxserve_config.nnodes,
                         self.muxserve_config.nproc_per_node,
                         job_config.pipeline_parallel_size,
@@ -203,8 +201,7 @@ class MuxScheduler:
                         ray_address=ray_address,
                         schedule_approach=self.muxserve_config.schedule_approach)
                     cluster_id += 1
-                self.processes[mps_percentage][model_name][dp_rank] = (proc,
-                                                                       port)
+                self.processes[mps_percentage][model_name][dp_rank] = (proc, port)
                 port += 1
 
                 tracer_proc_names.append(
@@ -239,7 +236,7 @@ class MuxScheduler:
 
         for job_config in self.muxserve_config.job_configs:
             model_name = job_config.name
-            model_config = AutoConfig.from_pretrained(job_config.model)
+            model_config = AutoConfig.from_pretrained(job_config.model_path)
             tensor_parallel_size = job_config.tensor_parallel_size
             num_heads = model_config.num_attention_heads // tensor_parallel_size
             partition = PipeWorker.pipeline_split(
@@ -277,7 +274,10 @@ class MuxScheduler:
                         PREEMPT_REQ_NAME_FMT
                 ]:
                     name = fmt.format(model_name, mps_percentage)
-                    close_shared_var(name)
+                    try:
+                        close_shared_var(name)
+                    except FileNotFoundError:
+                        logger.warning(f"Shared variable not found: {name}")
 
         # exit flexstore
         self.tcp_client.send_pyobj(["exit", None])
@@ -708,8 +708,7 @@ class MuxScheduler:
         return scheduled
 
     def schedule_decode(self, model):
-        max_micro_num_seqs = self.max_num_seqs[
-            model] // self.pipeline_parallel_size
+        max_micro_num_seqs = self.max_num_seqs[model] // self.pipeline_parallel_size
         running_queue = self.running[model]
         running_queue.sort()
 
@@ -779,8 +778,7 @@ class MuxScheduler:
 
         self.decoding_batches[model].append(len(running))
         self.decoding_batches["total"].append(len(running))
-        logger.info(f"Schedule {model} decoding {len(running)} requests: "
-                    f"{req_ids}")
+        logger.info(f"Schedule {model} decoding {len(running)} requests: {req_ids}")
         sm_res = self.sm_manager.allocate(num_sm, overload=True)
         # launch tasks
         status = None
@@ -918,8 +916,7 @@ class MuxScheduler:
                 scheduled_model_id = self._running_prefill_model_id
                 prefill_in_exec = True
             else:
-                self.warn_log(last_sched_time, last_warn_time, status, model,
-                              True)
+                self.warn_log(last_sched_time, last_warn_time, status, model, True)
         self._running_prefill_model_id = scheduled_model_id
 
         if not prefill_in_exec and not has_prefill_to_schedule:
@@ -1114,7 +1111,7 @@ class MuxScheduler:
                                    last_sched_time, last_warn_time)
             status, prefill_in_exec, last_sched_time, last_warn_time = ret
 
-            if self.get_tick() - last_sched_time > 60 * 4:
+            if self.get_tick() - last_sched_time > 60 * 10:
                 logger.info("Scheduler Timeout Error, Exit!")
                 self.is_finished = True
                 break
@@ -1159,7 +1156,7 @@ class MuxScheduler:
         for job_config in self.muxserve_config.job_configs:
             model_name = job_config.name
             self.sched_dict[model_name] = {}
-            self.sched_dict[model_name]["model_name"] = job_config.model
+            self.sched_dict[model_name]["model_name"] = job_config.model_path
             self.sched_dict[model_name]["mps"] = job_config.mps_percentage
             self.sched_dict[model_name]["first_token_latency"] = 0
             self.sched_dict[model_name]["output_per_token_latency"] = 0
@@ -1170,6 +1167,13 @@ class MuxScheduler:
         self.sched_dict["output_per_token_latency"] = 0
         self.sched_dict["request_num"] = 0
 
+        # 统计metrics
+        models = []
+        ttfts = []
+        tpots = []
+        input_lens = []
+        output_lens = []
+        
         model_to_requests = {}
         for i in range(len(self.workload)):
             req = self.workload.requests[i]
@@ -1189,7 +1193,21 @@ class MuxScheduler:
                 f"end {req.end_time:.3f} "
                 f"sched_lat {sched_lat:.3f} prefill_lat {prefill_lat:.3f} "
                 f"decode_lat {decode_lat:.3f} ")
-
+            
+            models.append(req.model_name)
+            ttfts.append(req.prefill_end_time - self.workload.arrivals[i])
+            tpots.append((req.end_time - req.prefill_end_time) / req.data[1])
+            input_lens.append(req.data[1])
+            output_lens.append(req.data[2])
+        with open("examples/basic/metrics.json", "w") as f:
+            json.dump({
+                "models": models,
+                "ttfts": ttfts,
+                "tpots": tpots,
+                "input_lens": input_lens,
+                "output_lens": output_lens,
+            }, f)
+            
         logger.info("")
         logger.info("Workload Statistics:")
         if self.workload.workload_infos:

@@ -1,0 +1,27 @@
+num_gpus: 1
+max_num_seqs: 2048
+overload_threshold: 3
+gpu_memory_utilization: 0.2
+
+models:
+  -
+    name: llm-0
+    model: meta-llama/Llama-2-7b-hf
+    tensor_parallel_size: 1
+    pipeline_parallel_size: 1
+    placement:
+      - [0]
+    mps_percentage: [100, 30]
+    model_dtype: fp16
+  -
+    name: llm-1
+    model: meta-llama/Llama-2-7b-hf
+    tensor_parallel_size: 1
+    pipeline_parallel_size: 1
+    placement:
+      - [0]
+    mps_percentage: [60, 40]
+    model_dtype: fp16
+workloads:
+  # leave empty, workload generation refer to README
+  workload_file:
