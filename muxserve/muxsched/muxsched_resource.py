@@ -96,7 +96,7 @@ class CacheResource:
         # job info
         self.model_blocks = {}
         for job_config in self.config.job_configs:
-            model_config = AutoConfig.from_pretrained(job_config.model)
+            model_config = AutoConfig.from_pretrained(job_config.model_path)
             # FIXME: single card currently
             assert job_config.tensor_parallel_size == 1, "tensor parallel is not supported"
             num_heads = model_config.num_attention_heads

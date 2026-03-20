@@ -25,22 +25,24 @@ def main_muxsched(muxserve_config: MuxServeConfig):
 def main(args: argparse.Namespace):
     muxserve_args = MuxServeArgs.from_cli_args(args)
     muxserve_config = muxserve_args.create_muxserve_config()
-
     if args.flexstore:
         main_flexstore(muxserve_config)
-
     if args.muxscheduler:
         main_muxsched(muxserve_config)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MuxServe Entry Point')
-    parser.add_argument("--flexstore",
-                        action="store_true",
-                        help="Launch FlexStore process.")
-    parser.add_argument("--muxscheduler",
-                        action="store_true",
-                        help="Launch MuxScheduler process.")
+    parser.add_argument(
+        "--flexstore",
+        action="store_true",
+        help="Launch FlexStore process."
+    )
+    parser.add_argument(
+        "--muxscheduler",
+        action="store_true",
+        help="Launch MuxScheduler process."
+    )
     parser = MuxServeArgs.add_cli_args(parser)
     args = parser.parse_args()
     main(args)

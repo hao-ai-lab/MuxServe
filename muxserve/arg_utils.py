@@ -183,20 +183,18 @@ class MuxServeArgs:
                 continue
             job_cfg = JobConfig(
                 name=model["name"],
-                model=model["model"],
+                model_path=model["model"],
                 pipeline_parallel_size=model["pipeline_parallel_size"],
                 tensor_parallel_size=model["tensor_parallel_size"],
                 placement=model["placement"],
                 mps_percentage=model["mps_percentage"],
-                max_num_seqs=getattr(model, "max_num_seqs",
-                                     model_config["max_num_seqs"]),
+                max_num_seqs=getattr(model, "max_num_seqs", model_config["max_num_seqs"]),
                 model_dtype=DTYPE_MAP[model["model_dtype"]],
             )
             if self.split_by_model is not None:
                 num_gpus = len(model["placement"][0])
             job_configs.append(job_cfg)
-            assert model["pipeline_parallel_size"] * model[
-                "tensor_parallel_size"] <= num_gpus, f"Exceeds {num_gpus} GPUs"
+            assert model["pipeline_parallel_size"] * model["tensor_parallel_size"] <= num_gpus, f"Exceeds {num_gpus} GPUs"
         assert len(job_configs) > 0, "No job is specified"
 
         if self.workload_file is not None:

@@ -40,12 +40,12 @@ def launch_flexserver(muxserve_config: MuxServeConfig, logdir: str):
         for mps_percentage in job_config.mps_percentage:
             is_prefill = True
             for dp_rank, placement in enumerate(job_config.placement):
-                model = job_config.model.split("/")[-1]
+                model = job_config.model_path.split("/")[-1]
                 logfile = f"{logdir}/{model}_n{len(placement)}_mps{mps_percentage}.log"
                 flexserver_proc = launch_flexserver_process(
                     model_id,
                     model_name,
-                    job_config.model,
+                    job_config.model_path,
                     muxserve_config.nnodes,
                     muxserve_config.nproc_per_node,
                     job_config.pipeline_parallel_size,

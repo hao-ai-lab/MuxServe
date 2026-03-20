@@ -1,13 +1,10 @@
 cluster:
   nnodes: 1
-  ngpus_per_node: 4
+  ngpus_per_node: 1
 models:
 - name: llm-0
-  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-7b
-  rate: 12
+  model: meta-llama/Llama-2-7b-hf
+  rate: 10
 - name: llm-1
-  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-13b
-  rate: 5
-- name: llm-2
-  model: /mnt/afs/share/LLMCKPTs/huggyllama/llama-30b
-  rate: 3
+  model: meta-llama/Llama-2-7b-hf
+  rate: 10
